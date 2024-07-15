@@ -16,3 +16,40 @@ type WxEvent struct {
 	EventKey     string `xml:"EventKey"`
 	Ticket       string `xml:"Ticket"`
 }
+
+type AccessToken struct {
+	Value     string `json:"access_token"`
+	ExpiresIn int    `json:"expires_in"`
+}
+
+// Value: 获取的二维码ticket，凭借此ticket可以在有效时间内换取二维码。
+// ExpireSeconds: 该二维码有效时间，以秒为单位。 最大不超过2592000（即30天）。
+// Url: 二维码图片解析后的地址，开发者可根据该地址自行生成需要的二维码图片
+type Ticket struct {
+	Value         string `json:"ticket"`
+	ExpireSeconds int    `json:"expire_seconds"`
+	Url           string `json:"url"`
+	SceneStr      string `json:"scene_str"`
+	ErrCode       int    `json:"errcode"`
+	ErrMsg        string `json:"errmsg"`
+}
+
+// action_name	二维码类型，QR_SCENE为临时的整型参数值，QR_STR_SCENE为临时的字符串参数值，QR_LIMIT_SCENE为永久的整型参数值，QR_LIMIT_STR_SCENE为永久的字符串参数值
+// expire_seconds	该二维码有效时间，以秒为单位。 最大不超过2592000（即30天），此字段如果不填，则默认有效期为60秒。
+// action_info	二维码详细信息
+//
+//	|-- scene
+//		|-- scene_str	场景值ID（字符串形式的ID），字符串类型，长度限制为1到64
+type ticketRequest struct {
+	ActionName    string     `json:"action_name"`
+	ActionInfo    actionInfo `json:"action_info"`
+	ExpireSeconds int        `json:"expire_seconds"`
+}
+
+type actionInfo struct {
+	Scene scene `json:"scene"`
+}
+
+type scene struct {
+	SceneStr string `json:"scene_str"`
+}

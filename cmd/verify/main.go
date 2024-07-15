@@ -13,8 +13,6 @@ import (
 
 var token = "2zeCr3Tco8J8q8s30GjfphpZwBHMFiGz"
 
-var EncodingAESKey = "Dy9potcczZPOKJHhUqgw0lTzgkDn9JUWOt7fDHk95IF"
-
 func main() {
 	router := gin.Default()
 

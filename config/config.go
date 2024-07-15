@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
-	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/viper"
 )
 
@@ -30,20 +29,22 @@ var (
 	AppConfig appConfig
 )
 
-func LoadEnv() error {
+func LoadEnv() (err error) {
 	viper.AddConfigPath(".")
 	viper.SetConfigName("wxconfig")
 	viper.SetConfigType("toml")
 	// 读取配置文件
-	if err := viper.ReadInConfig(); err != nil {
+	if err = viper.ReadInConfig(); err != nil {
 		log.Fatalf("read config failed: %v", err)
+		return
 	}
 
-	err := viper.Unmarshal(&AppConfig)
+	err = viper.Unmarshal(&AppConfig)
 	if err != nil {
 		log.Printf("read config failed: %v", err)
+		return
 	}
-
+	// 监听配置文件变化
 	viper.OnConfigChange(func(in fsnotify.Event) {
 		log.Printf("配置文件发生改变: %s\n", in.Name)
 		if in.Op == fsnotify.Write && strings.Contains(in.Name, "wxconfig") {
@@ -53,5 +54,5 @@ func LoadEnv() error {
 	log.Printf("读取配置 Config: %+v", AppConfig)
 
 	viper.WatchConfig()
-	return nil
+	return
 }
