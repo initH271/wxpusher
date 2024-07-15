@@ -24,7 +24,7 @@ func main() {
 		timestamp := ctx.Query("timestamp")
 		nonce := ctx.Query("nonce")
 		echostr := ctx.Query("echostr")
-		valid := wxapi.CheckSignature(config.WxConfig.Token, timestamp, nonce, signature)
+		valid := wxapi.CheckSignature(config.AppConfig.WxConfig.Token, timestamp, nonce, signature)
 		if valid {
 			log.Println("[/]:  the signature is valid")
 			ctx.String(http.StatusOK, echostr)
@@ -49,17 +49,17 @@ func main() {
 		case "SCAN":
 			// 扫码事件, 已关注用户触发
 			log.Printf("[Event] user %s 扫码成功.", wxEvent.FromUserName)
-			wxapi.SendLoginTemplateMsg("1W-NG2s_7Ka42FnzCzEQaug5cPDaCEebNdjJYAc9sxU", wxEvent.FromUserName, config.WxConfig.AccessToken)
+			wxapi.SendLoginTemplateMsg("1W-NG2s_7Ka42FnzCzEQaug5cPDaCEebNdjJYAc9sxU", wxEvent.FromUserName, config.AppConfig.WxConfig.AccessToken)
 		case "subscribe":
 			// 用户点击关注
 			log.Printf("[Event] user %s 关注公众号.", wxEvent.FromUserName)
-			wxapi.SendLoginTemplateMsg("ss8JStEE8H1TOe-uQAi-YKfJAH6FxgTlAeoynZuYa0s", wxEvent.FromUserName, config.WxConfig.AccessToken)
+			wxapi.SendLoginTemplateMsg("ss8JStEE8H1TOe-uQAi-YKfJAH6FxgTlAeoynZuYa0s", wxEvent.FromUserName, config.AppConfig.WxConfig.AccessToken)
 		case "unsubscribe":
 			// 用户取消关注
 			log.Printf("[Event] user %s 取消了关注.", wxEvent.FromUserName)
 		case "TEMPLATESENDJOBFINISH":
 			// 模板消息发送成功
-			
+
 		default:
 			// 其他事件触发
 			log.Printf("[Event] user %s 触发了其他事件: %+v", wxEvent.FromUserName, wxEvent)
@@ -76,7 +76,7 @@ func main() {
 			})
 			return
 		}
-		config.WxConfig.AccessToken = acToken.Value
+		config.AppConfig.WxConfig.AccessToken = acToken.Value
 		ctx.JSON(http.StatusOK, acToken)
 	})
 

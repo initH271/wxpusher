@@ -23,7 +23,7 @@ type AccessToken struct {
 // expiresIn := jsonMap["expires_in"] // 7200 seconds
 func GetAccessToken() (acToken AccessToken, err error) {
 	api := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
-		config.WxConfig.AppID, config.WxConfig.AppSecret)
+		config.AppConfig.WxConfig.AppID, config.AppConfig.WxConfig.AppSecret)
 	resp, err := http.Get(api)
 	if err != nil {
 		return
@@ -82,7 +82,7 @@ func GetTicket() (ticket Ticket, err error) {
 		log.Println("Error generating UUID v1:", err)
 		return
 	}
-	api := "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + config.WxConfig.AccessToken
+	api := "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + config.AppConfig.WxConfig.AccessToken
 	tReq := &ticketRequest{
 		ActionName: "QR_STR_SCENE", // 生成临时二维码
 		ActionInfo: actionInfo{
