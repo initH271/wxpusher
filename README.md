@@ -56,3 +56,7 @@ go run main.go
 4. . 在微信公众号后台配置服务器URL与Token
 
 **微信扫码登录demo**: 浏览器访问 /public接口
+![](https://blog.inith271.top/images/wx-scan-login.gif)
+
+**系列文章:**
+1. [微信公众号开发指南1 - 微信扫码登录实战](https://blog.inith271.top/posts/wx-guide-1/)
