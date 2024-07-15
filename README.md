@@ -29,7 +29,7 @@ Linux服务器中:
 ```sh
 go mod tidy && go build .
 ```
-2. 登录微信公众号后台, 根据`.env`文件添加对应环境变量
+2. 登录微信公众号后台, 根据`wxconfig.toml`文件添加对应环境变量
 
 3. 运行`./wxpusher`, 并解析域名到8080端口
 
@@ -37,7 +37,7 @@ go mod tidy && go build .
 
 
 Windows 本地机器调试
-1. 登录微信公众号后台, 修改`.env`文件中对应环境变量
+1. 登录微信公众号后台, 修改`wxconfig.toml`文件中对应环境变量
 
 2. 运行项目
 ```sh
