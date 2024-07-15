@@ -9,6 +9,18 @@
 
 ## 快速开始
 
+.env文件示例, 如果不配置环境变量,那么应该在项目或可执行文件目录下创建.env文件
+
+```conf
+APP_ID=wx7cd7fdsadasd179bc
+APP_SECRET=f8816ee02dasdasdasdasf47f656d3
+TOKEN=2zeCr3TcoxaxaxsadasfadfasdasGz
+ENCODING_AES_KEY=Dy9potcczZPOKJsssfDHk95IF
+
+ACCESS_TOKEN_TMP=
+
+PORT=8080
+```
 
 Linux服务器中: 
 1. 编译项目
