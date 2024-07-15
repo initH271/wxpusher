@@ -16,6 +16,7 @@ type qrCodeController struct {
 func NewQrCodeRouter(router *gin.RouterGroup) {
 	controller := &qrCodeController{}
 	qrCodeRouter := router.Group("qrCode")
+	qrCodeRouter.GET("/createImage", controller.CreateWxQrCodeImage)
 	qrCodeRouter.GET("/create", controller.CreateWxQrCode)
 }
 
@@ -23,7 +24,19 @@ func (controller *qrCodeController) CreateWxQrCode(ctx *gin.Context) {
 	ticket, err := wxapi.GetTicket(config.AppConfig.WxConfig.AccessToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"err": "获取二维码",
+			"error": "获取凭证失败",
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, ticket)
+
+}
+
+func (controller *qrCodeController) CreateWxQrCodeImage(ctx *gin.Context) {
+	ticket, err := wxapi.GetTicket(config.AppConfig.WxConfig.AccessToken)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": "获取二维码图片失败",
 		})
 		return
 	}

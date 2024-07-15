@@ -38,6 +38,7 @@ func GetAccessToken(appID, appSecret string) (acToken AccessToken, err error) {
 	return
 }
 
+
 // 获取临时二维码
 func GetTicket(accessToken string) (ticket Ticket, err error) {
 	uuidV1, err := uuid.NewUUID()
@@ -84,6 +85,7 @@ func GetTicket(accessToken string) (ticket Ticket, err error) {
 	}
 	if ticket.ErrCode != 0 {
 		log.Println("Error get ticket:", ticket.ErrMsg)
+		err = fmt.Errorf("Error get ticket: %s", ticket.ErrMsg)
 		return
 	}
 	return

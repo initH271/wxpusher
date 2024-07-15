@@ -39,7 +39,7 @@ func (controller *wxVerifyController) GetAccessToken(ctx *gin.Context) {
 	acToken, err := wxapi.GetAccessToken(config.AppConfig.WxConfig.AppID, config.AppConfig.WxConfig.AppSecret)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{
-			"err": "请求失败",
+			"error": "请求失败",
 		})
 		return
 	}
