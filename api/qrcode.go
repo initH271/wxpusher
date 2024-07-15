@@ -3,18 +3,25 @@ package api
 import (
 	"log"
 	"net/http"
+	"time"
 	"wxpusher/config"
+	"wxpusher/internal/domain"
+	"wxpusher/internal/usecase"
 	"wxpusher/pkg/wxapi"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"github.com/skip2/go-qrcode"
 )
 
 type qrCodeController struct {
+	authUsecase domain.IWxAuthUsecase
 }
 
-func NewQrCodeRouter(router *gin.RouterGroup) {
-	controller := &qrCodeController{}
+func NewQrCodeRouter(router *gin.RouterGroup, rdb redis.Cmdable) {
+	controller := &qrCodeController{
+		authUsecase: usecase.NewWxAuthUsecase(rdb),
+	}
 	qrCodeRouter := router.Group("qrCode")
 	qrCodeRouter.GET("/createImage", controller.CreateWxQrCodeImage)
 	qrCodeRouter.GET("/create", controller.CreateWxQrCode)
@@ -28,6 +35,8 @@ func (controller *qrCodeController) CreateWxQrCode(ctx *gin.Context) {
 		})
 		return
 	}
+	// 缓存凭证到redis
+	controller.authUsecase.CacheTicket(ctx, ticket, 2*time.Minute)
 	ctx.JSON(http.StatusOK, ticket)
 
 }
@@ -47,6 +56,8 @@ func (controller *qrCodeController) CreateWxQrCodeImage(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "生成二维码失败"})
 		return
 	}
+	controller.authUsecase.CacheTicket(ctx, ticket, 2*time.Minute)
+
 	// 将二维码图片写入响应
 	ctx.Header("Content-Type", "image/png")
 	b, _ := qr.PNG(256)

@@ -4,20 +4,27 @@ import (
 	"log"
 	"net/http"
 	"wxpusher/config"
+	"wxpusher/internal/domain"
+	"wxpusher/internal/usecase"
 	"wxpusher/pkg/wxapi"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 type wxVerifyController struct {
+	wxAuthUsecase domain.IWxAuthUsecase
 }
 
-func NewWxVerifyRouter(router *gin.RouterGroup) {
-	controller := &wxVerifyController{}
+func NewWxVerifyRouter(router *gin.RouterGroup, rdb redis.Cmdable) {
+	controller := &wxVerifyController{
+		wxAuthUsecase: usecase.NewWxAuthUsecase(rdb),
+	}
 	// 服务器验证
 	router.GET("/verify", controller.Verify)
 	// 获取accessToken
 	router.GET("/getAccessToken", controller.GetAccessToken)
+	router.GET("/checkLogin/:ticket", controller.CheckLogin)
 }
 
 func (controller *wxVerifyController) Verify(ctx *gin.Context) {
@@ -45,4 +52,13 @@ func (controller *wxVerifyController) GetAccessToken(ctx *gin.Context) {
 	}
 	config.AppConfig.WxConfig.AccessToken = acToken.Value
 	ctx.JSON(http.StatusOK, acToken)
+}
+
+func (controller *wxVerifyController) CheckLogin(ctx *gin.Context) {
+	ticket := ctx.Param("ticket")
+	status := controller.wxAuthUsecase.GetLoginStatusWithTicket(ctx, ticket)
+	log.Printf("[GET /checkLogin/:ticket]: 登录状态[%+v]", status)
+	ctx.JSON(http.StatusOK, gin.H{
+		"code": status,
+	})
 }

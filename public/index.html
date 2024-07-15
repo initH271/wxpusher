@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>登录页面</title>
+        <style>
+
+        body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+#qrcode {
+    width: 200px;
+    height: 200px;
+    display: none; /* 默认不显示二维码 */
+}
+
+#login-status {
+    margin-top: 20px;
+}
+    </style>
+    </head>
+    <body>
+        <div id="login-status">等待登录...</div>
+        <img id="qrcode" src alt="二维码">
+        <script>
+        const user = {
+            openId: '',
+            ticket: ''
+        };
+
+        function createQRCode() {
+            fetch('http://wxpusher.inith271.top/wx/qrCode/create')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.errcode === 0) {
+                        user.ticket = data.ticket;
+                        // 通过encodeURIComponent对ticket进行编码
+                const encodedTicket = encodeURIComponent(user.ticket);
+                // 拼接完整的二维码URL
+                const qrcodeUrl = `https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=${encodedTicket}`;
+                displayQRCode(qrcodeUrl);
+                checkLogin();
+                    } else {
+                        console.error('创建二维码失败:', data.errmsg);
+                    }
+                })
+                .catch(error => console.error('请求二维码失败:', error));
+        }
+
+        function displayQRCode(url) {
+            const qrcodeImage = document.getElementById('qrcode');
+            qrcodeImage.src = url;
+            qrcodeImage.style.display = 'block'; // 显示二维码
+        }
+
+        function checkLogin() {
+            if (!user.ticket) return;
+
+            const encodedTicket = encodeURIComponent(user.ticket);
+            fetch(`http://wxpusher.inith271.top/wx/checkLogin/${encodedTicket}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 0) {
+                        setTimeout(checkLogin, 2000); // 轮询检查登录状态
+                    } else if (data.code === 1) {
+        document.getElementById('login-status').innerText = '欢迎登录!';
+        const qrcodeImage = document.getElementById('qrcode');
+        qrcodeImage.style.display = 'none'; // 登录成功后隐藏二维码
+                    } else if (data.code === 2) {
+        document.getElementById('login-status').innerText = '二维码失效, 请刷新页面!';
+        const qrcodeImage = document.getElementById('qrcode');
+        qrcodeImage.style.display = 'none'; // 隐藏二维码
+                    } 
+                })
+                .catch(error => console.error('检查登录状态失败:', error));
+        }
+
+        // 页面加载完成后创建二维码
+        document.addEventListener('DOMContentLoaded', createQRCode);
+    </script>
+    </body>
+</html>

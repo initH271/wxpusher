@@ -6,16 +6,22 @@ import (
 	"log"
 	"net/http"
 	"wxpusher/config"
+	"wxpusher/internal/domain"
+	"wxpusher/internal/usecase"
 	"wxpusher/pkg/wxapi"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 type wxCallbackController struct {
+	wxAuthUsecase domain.IWxAuthUsecase
 }
 
-func NewWxCallbackRouter(router *gin.RouterGroup) {
-	controller := &wxCallbackController{}
+func NewWxCallbackRouter(router *gin.RouterGroup, rdb redis.Cmdable) {
+	controller := &wxCallbackController{
+		wxAuthUsecase: usecase.NewWxAuthUsecase(rdb),
+	}
 	// 微信事件推送回调
 	router.POST("/verify", controller.Callback)
 }
@@ -35,10 +41,12 @@ func (controller *wxCallbackController) Callback(ctx *gin.Context) {
 	case "SCAN":
 		// 扫码事件, 已关注用户触发
 		log.Printf("[Event] user %s 扫码成功.", wxEvent.FromUserName)
+		controller.wxAuthUsecase.DoLoginStatusWithTicket(ctx, wxEvent.Ticket, wxEvent.FromUserName)
 		wxapi.SendLoginTemplateMsg("1W-NG2s_7Ka42FnzCzEQaug5cPDaCEebNdjJYAc9sxU", wxEvent.FromUserName, config.AppConfig.WxConfig.AccessToken)
 	case "subscribe":
 		// 用户点击关注
 		log.Printf("[Event] user %s 关注公众号.", wxEvent.FromUserName)
+		controller.wxAuthUsecase.DoLoginStatusWithTicket(ctx, wxEvent.Ticket, wxEvent.FromUserName)
 		wxapi.SendLoginTemplateMsg("ss8JStEE8H1TOe-uQAi-YKfJAH6FxgTlAeoynZuYa0s", wxEvent.FromUserName, config.AppConfig.WxConfig.AccessToken)
 	case "unsubscribe":
 		// 用户取消关注
