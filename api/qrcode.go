@@ -13,7 +13,7 @@ import (
 type qrCodeController struct {
 }
 
-func NewQrCodeRouter(router *gin.Engine) {
+func NewQrCodeRouter(router *gin.RouterGroup) {
 	controller := &qrCodeController{}
 	qrCodeRouter := router.Group("qrCode")
 	qrCodeRouter.GET("/create", controller.CreateWxQrCode)

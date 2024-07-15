@@ -1,0 +1,12 @@
+# compose.yaml
+# command: 
+#	docker compose up -d
+# docker compose down
+services:  
+  redis:  
+    image: 'redis:7.2'  
+    restart: unless-stopped  
+    environment:  
+      - ALLOW_EMPTY_PASSWORD=yes  
+    ports:  
+      - '16379:6379'

@@ -45,7 +45,7 @@ func (controller *wxCallbackController) Callback(ctx *gin.Context) {
 		log.Printf("[Event] user %s 取消了关注.", wxEvent.FromUserName)
 	case "TEMPLATESENDJOBFINISH":
 		// 模板消息发送成功事件
-
+		log.Printf("[Event] 发送模板消息给 user %s.", wxEvent.FromUserName)
 	default:
 		// 其他事件触发
 		log.Printf("[Event] user %s 触发了其他事件: %+v", wxEvent.FromUserName, wxEvent)
